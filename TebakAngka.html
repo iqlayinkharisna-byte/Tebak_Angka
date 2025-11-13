@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Tebak Angka</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        header {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 25px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .game-container {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 30px;
+        }
+        
+        .game-info {
+            flex: 1;
+            min-width: 300px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            margin-right: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .game-controls {
+            flex: 1;
+            min-width: 300px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            color: #ffcc00;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        input {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.5);
+            transform: scale(1.02);
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .guess-btn {
+            background: linear-gradient(to right, #00b09b, #96c93d);
+            color: white;
+        }
+        
+        .reset-btn {
+            background: linear-gradient(to right, #ff416c, #ff4b2b);
+            color: white;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.15);
+            transition: all 0.3s;
+        }
+        
+        .success {
+            background: rgba(46, 204, 113, 0.3);
+            border-left: 5px solid #2ecc71;
+        }
+        
+        .error {
+            background: rgba(231, 76, 60, 0.3);
+            border-left: 5px solid #e74c3c;
+        }
+        
+        .hint {
+            background: rgba(241, 196, 15, 0.3);
+            border-left: 5px solid #f1c40f;
+        }
+        
+        .attempts {
+            margin-top: 25px;
+        }
+        
+        .attempts-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+        }
+        
+        .attempt-item {
+            padding: 10px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .attempt-number {
+            font-weight: bold;
+        }
+        
+        .attempt-result {
+            color: #ffcc00;
+        }
+        
+        .difficulty {
+            margin-top: 20px;
+        }
+        
+        .difficulty-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .difficulty-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .difficulty-btn.active {
+            background: rgba(255, 204, 0, 0.5);
+            font-weight: bold;
+        }
+        
+        .difficulty-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .range-info {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            text-align: center;
+        }
+        
+        @media (max-width: 768px) {
+            .game-container {
+                flex-direction: column;
+            }
+            
+            .game-info {
+                margin-right: 0;
+            }
+        }
+        
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            opacity: 0;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-dice"></i> Game Tebak Angka</h1>
+            <p class="subtitle">Uji keberuntungan dan kemampuan menebak Anda!</p>
+        </header>
+        
+        <div class="game-container">
+            <div class="game-info">
+                <h2 class="section-title"><i class="fas fa-chart-line"></i> Statistik Game</h2>
+                
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-label">Level Kesulitan</div>
+                        <div class="stat-value" id="difficulty-level">Mudah</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-label">Rentang Angka</div>
+                        <div class="stat-value" id="number-range">1-50</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-label">Percobaan</div>
+                        <div class="stat-value" id="attempts-count">0</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-label">Skor</div>
+                        <div class="stat-value" id="score">100</div>
+                    </div>
+                </div>
+                
+                <div class="difficulty">
+                    <h3 class="section-title"><i class="fas fa-sliders-h"></i> Tingkat Kesulitan</h3>
+                    <div class="difficulty-buttons">
+                        <button class="difficulty-btn active" data-level="easy">Mudah</button>
+                        <button class="difficulty-btn" data-level="medium">Sedang</button>
+                        <button class="difficulty-btn" data-level="hard">Sulit</button>
+                    </div>
+                    <p class="range-info" id="range-info">Tebak angka antara 1 dan 50</p>
+                </div>
+            </div>
+            
+            <div class="game-controls">
+                <h2 class="section-title"><i class="fas fa-gamepad"></i> Kontrol Game</h2>
+                
+                <div class="input-group">
+                    <label for="guess-input"><i class="fas fa-bullseye"></i> Masukkan Tebakan Anda:</label>
+                    <input type="number" id="guess-input" placeholder="Masukkan angka...">
+                </div>
+                
+                <div class="buttons">
+                    <button class="guess-btn" id="guess-btn">
+                        <i class="fas fa-paper-plane"></i> Tebak
+                    </button>
+                    <button class="reset-btn" id="reset-btn">
+                        <i class="fas fa-redo"></i> Ulang Game
+                    </button>
+                </div>
+                
+                <div class="message" id="message">
+                    Selamat datang! Silakan tebak angka antara 1 dan 50.
+                </div>
+                
+                <div class="attempts">
+                    <h3 class="section-title"><i class="fas fa-history"></i> Riwayat Tebakan</h3>
+                    <div class="attempts-list" id="attempts-list">
+                        <!-- Riwayat tebakan akan muncul di sini -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variabel game
+        let targetNumber;
+        let attempts;
+        let maxAttempts;
+        let score;
+        let gameOver;
+        let difficulty;
+        
+        // Elemen DOM
+        const guessInput = document.getElementById('guess-input');
+        const guessBtn = document.getElementById('guess-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const messageEl = document.getElementById('message');
+        const attemptsList = document.getElementById('attempts-list');
+        const attemptsCountEl = document.getElementById('attempts-count');
+        const scoreEl = document.getElementById('score');
+        const difficultyLevelEl = document.getElementById('difficulty-level');
+        const numberRangeEl = document.getElementById('number-range');
+        const rangeInfoEl = document.getElementById('range-info');
+        const difficultyBtns = document.querySelectorAll('.difficulty-btn');
+        
+        // Inisialisasi game
+        function initGame() {
+            difficulty = 'easy';
+            setDifficulty(difficulty);
+            resetGame();
+            
+            // Event listeners
+            guessBtn.addEventListener('click', handleGuess);
+            resetBtn.addEventListener('click', resetGame);
+            guessInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    handleGuess();
+                }
+            });
+            
+            // Event listeners untuk tombol kesulitan
+            difficultyBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    difficulty = this.getAttribute('data-level');
+                    setDifficulty(difficulty);
+                    resetGame();
+                });
+            });
+        }
+        
+        // Atur tingkat kesulitan
+        function setDifficulty(level) {
+            // Hapus kelas aktif dari semua tombol
+            difficultyBtns.forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Tambah kelas aktif ke tombol yang dipilih
+            document.querySelector(`.difficulty-btn[data-level="${level}"]`).classList.add('active');
+            
+            // Atur pengaturan berdasarkan tingkat kesulitan
+            switch(level) {
+                case 'easy':
+                    maxAttempts = 10;
+                    difficultyLevelEl.textContent = 'Mudah';
+                    numberRangeEl.textContent = '1-50';
+                    rangeInfoEl.textContent = 'Tebak angka antara 1 dan 50';
+                    break;
+                case 'medium':
+                    maxAttempts = 7;
+                    difficultyLevelEl.textContent = 'Sedang';
+                    numberRangeEl.textContent = '1-100';
+                    rangeInfoEl.textContent = 'Tebak angka antara 1 dan 100';
+                    break;
+                case 'hard':
+                    maxAttempts = 5;
+                    difficultyLevelEl.textContent = 'Sulit';
+                    numberRangeEl.textContent = '1-200';
+                    rangeInfoEl.textContent = 'Tebak angka antara 1 dan 200';
+                    break;
+            }
+        }
+        
+        // Reset game
+        function resetGame() {
+            switch(difficulty) {
+                case 'easy':
+                    targetNumber = Math.floor(Math.random() * 50) + 1;
+                    break;
+                case 'medium':
+                    targetNumber = Math.floor(Math.random() * 100) + 1;
+                    break;
+                case 'hard':
+                    targetNumber = Math.floor(Math.random() * 200) + 1;
+                    break;
+            }
+            
+            attempts = 0;
+            score = 100;
+            gameOver = false;
+            
+            guessInput.value = '';
+            guessInput.disabled = false;
+            guessBtn.disabled = false;
+            
+            attemptsCountEl.textContent = attempts;
+            scoreEl.textContent = score;
+            
+            messageEl.textContent = `Selamat datang! Silakan tebak angka ${difficulty === 'easy' ? 'antara 1 dan 50' : difficulty === 'medium' ? 'antara 1 dan 100' : 'antara 1 dan 200'}.`;
+            messageEl.className = 'message';
+            
+            attemptsList.innerHTML = '';
+        }
+        
+        // Handle tebakan
+        function handleGuess() {
+            if (gameOver) return;
+            
+            const guess = parseInt(guessInput.value);
+            
+            // Validasi input
+            if (isNaN(guess)) {
+                showMessage('Masukkan angka yang valid!', 'error');
+                return;
+            }
+            
+            let min, max;
+            switch(difficulty) {
+                case 'easy':
+                    min = 1;
+                    max = 50;
+                    break;
+                case 'medium':
+                    min = 1;
+                    max = 100;
+                    break;
+                case 'hard':
+                    min = 1;
+                    max = 200;
+                    break;
+            }
+            
+            if (guess < min || guess > max) {
+                showMessage(`Angka harus antara ${min} dan ${max}!`, 'error');
+                return;
+            }
+            
+            // Proses tebakan
+            attempts++;
+            attemptsCountEl.textContent = attempts;
+            
+            // Kurangi skor berdasarkan percobaan
+            score = Math.max(0, 100 - (attempts * (100 / maxAttempts)));
+            scoreEl.textContent = Math.round(score);
+            
+            // Tambahkan ke riwayat
+            addAttemptToHistory(guess);
+            
+            // Periksa tebakan
+            if (guess === targetNumber) {
+                // Tebakan benar
+                showMessage(`Selamat! Anda menebak angka ${targetNumber} dengan benar dalam ${attempts} percobaan!`, 'success');
+                gameOver = true;
+                guessInput.disabled = true;
+                guessBtn.disabled = true;
+                createConfetti();
+            } else {
+                // Tebakan salah
+                if (attempts >= maxAttempts) {
+                    showMessage(`Game over! Angka yang benar adalah ${targetNumber}.`, 'error');
+                    gameOver = true;
+                    guessInput.disabled = true;
+                    guessBtn.disabled = true;
+                } else {
+                    const hint = guess < targetNumber ? 'terlalu rendah' : 'terlalu tinggi';
+                    showMessage(`Tebakan Anda ${hint}. Coba lagi!`, 'hint');
+                }
+            }
+            
+            guessInput.value = '';
+            guessInput.focus();
+        }
+        
+        // Tampilkan pesan
+        function showMessage(text, type) {
+            messageEl.textContent = text;
+            messageEl.className = 'message';
+            
+            if (type === 'success') {
+                messageEl.classList.add('success');
+            } else if (type === 'error') {
+                messageEl.classList.add('error');
+            } else if (type === 'hint') {
+                messageEl.classList.add('hint');
+            }
+        }
+        
+        // Tambahkan tebakan ke riwayat
+        function addAttemptToHistory(guess) {
+            const attemptItem = document.createElement('div');
+            attemptItem.className = 'attempt-item';
+            
+            const guessResult = guess === targetNumber ? 'TEPAT!' : 
+                              guess < targetNumber ? 'Terlalu Rendah' : 'Terlalu Tinggi';
+            
+            attemptItem.innerHTML = `
+                <span class="attempt-number">${guess}</span>
+                <span class="attempt-result">${guessResult}</span>
+            `;
+            
+            attemptsList.prepend(attemptItem);
+        }
+        
+        // Buat efek confetti
+        function createConfetti() {
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+            
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.top = '-10px';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.opacity = '1';
+                confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                document.body.appendChild(confetti);
+                
+                // Animasi confetti
+                const animation = confetti.animate([
+                    { top: '-10px', transform: `rotate(0deg)` },
+                    { top: '100vh', transform: `rotate(${Math.random() * 720}deg)` }
+                ], {
+                    duration: 2000 + Math.random() * 3000,
+                    easing: 'cubic-bezier(0.1, 0.8, 0.2, 1)'
+                });
+                
+                // Hapus confetti setelah animasi selesai
+                animation.onfinish = () => {
+                    confetti.remove();
+                };
+            }
+        }
+        
+        // Inisialisasi game saat halaman dimuat
+        window.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>
